@@ -24,7 +24,7 @@ void VertexArray::AddBuffer(const VertexBuffer & vb, const VertexBufferLayout & 
 	
 }
 
-void VertexArray::Bind(){
+void VertexArray::Bind() const{
 	glBindVertexArray(m_RendererID);
 }
 

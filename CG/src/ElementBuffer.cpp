@@ -1,5 +1,4 @@
 #include "ElementBuffer.h"
-#include "Renderer.h"
 
 ElementBuffer::ElementBuffer(const unsigned int* data, unsigned int count) : m_Count(count){
 	glGenBuffers(1, &m_RendererID);

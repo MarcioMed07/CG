@@ -1,64 +1,108 @@
-#include "Main.h"
+#include <iostream>
 #include "Renderer.h"
-#include "VertexBuffer.h"
-#include "ElementBuffer.h"
-#include "VertexArray.h"
-#include "Shader.h"
+#include "Texture.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
+void processInput(GLFWwindow *window, float* pace, float* max);
+GLFWwindow* initWindow();
 
 int main()
 {
 	GLFWwindow* window = initWindow();
 
 	glViewport(0, 0, 800, 600);
-	
-	Shader shader("resources//shaders//Basic.shader");
-	shader.Bind();
-	shader.SetUniform4f("u_color", 1.0f,1.0f,0.0f,1.0f);	
-
 	float vertices[] = {
-		 0.5f,  0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		-0.5f, -0.5f, 0.0f,
-		-0.5f,  0.5f, 0.0f,
+		-1.0f, -1.0f, 0.0f, 0.0f,
+		 1.0f, -1.0f, 1.0f, 0.0f,
+		 1.0f,  1.0f, 1.0f, 1.0f,
+		-1.0f,  1.0f, 0.0f, 1.0f
 	};
 
 	unsigned int indices[] = {
-		0, 1, 3,
-		1, 2, 3
+		0, 1, 2,
+		2, 3, 0
 	};
 
-	VertexArray va;	
-	VertexBuffer vb(vertices, sizeof(vertices));
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);	
+
+	VertexArray vertexArray;
+	VertexBuffer vertexBuffer(vertices, sizeof(vertices));
+
 	VertexBufferLayout layout;
-	layout.Push<float>(3);
-	va.AddBuffer(vb, layout);
-	ElementBuffer eb(indices, 6);
-			
-	va.Bind();
-	eb.Bind();
+	layout.Push<float>(2);
+	layout.Push<float>(2);
+	vertexArray.AddBuffer(vertexBuffer, layout);
+	
+	ElementBuffer elementBuffer(indices, 6);
+
+	glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+
+	Shader shader("resources/shaders/Basic.shader");
+	shader.Bind();
+	shader.SetUniformMat4f("u_MVP", proj);
+
+	Texture texture("resources/textures/wat.png");
+	texture.Bind();
+	shader.SetUniform1i("u_Texture", 0);
+
+	Texture displace("resources/textures/disp.png");
+	texture.Bind();
+	displace.Bind(1);
+	shader.SetUniform1i("u_DisplaceMap", 1);
+
+	shader.SetUniform1f("u_Time", 0.0f);
+	shader.SetUniform1f("u_Maximum", 0.1f);
+
+	vertexArray.Unbind();
+	vertexBuffer.Unbind();
+	elementBuffer.Unbind();
+	shader.Unbind();
+	
+	Renderer renderer;
 		
-	float pace = 0.02f;
-	float color = 0.1f;
+	float r, g, b, pace;
+	r = 0.0f;
+	g = 0.0f;
+	b = 0.0f;
+	pace = 0.000f;
+	float count = 0.0f;
+	float max = 0.0f;
 
 	while (!glfwWindowShouldClose(window))
 	{
 		//Input
-			processInput(window);
+			processInput(window, &pace, &max);
 		
 		//Process
-			pace = color >= 1.0f || color <= 0.0f ? pace * -1.0f : pace;
-			color += pace;
+			count += pace;
+			shader.Bind();
+			shader.SetUniform1f("u_Time", count);
+			shader.SetUniform1f("u_Maximum", max);
 
-		//Render
-			glClearColor(0.0f, color, 1.0f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);		
-		
-			shader.SetUniform4f("u_color", 1.0f, 1.0f, color, 1.0f);
-			glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(unsigned int), GL_UNSIGNED_INT,0);
+			/*
+			if (r < 1.0f && r >= 0.0f) {
+				r += pace;
+			}
+			else if (g < 1.0f && g >= 0.0f) {
+				g += pace;
+			}
+			else if (b < 1.0f && b >= 0.0f) {
+				b += pace;
+			}
+			else {
+				pace = pace * -1;
+				r += pace;
+				g += pace;
+				b += pace;
+				std::cout << "mec";
+			}*/
 
+		//Render			
+			renderer.Draw(vertexArray, elementBuffer, shader);
 		//Buffer swapping
-			glfwSwapBuffers(window);
-		
+			glfwSwapBuffers(window);		
 		//Poll and process events
 			glfwPollEvents();
 	}
@@ -67,10 +111,28 @@ int main()
 	return 0;
 }
 
-void processInput(GLFWwindow *window)
+void processInput(GLFWwindow *window, float* pace, float* max)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	float increasePace = 0.001;
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		*pace += increasePace;
+		std::cout << "pace: " << *pace << std::endl;
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		*pace -= increasePace;
+		std::cout << "pace: " << *pace << std::endl;
+	}
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		*max += increasePace;
+		std::cout << "max: " << *max << std::endl;
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		*max -= increasePace;
+		std::cout << "max: " << *max << std::endl;
+	}
 }
 
 GLFWwindow* initWindow() {

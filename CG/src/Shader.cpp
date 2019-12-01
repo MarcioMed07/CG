@@ -1,7 +1,4 @@
 #include "Shader.h"
-#include "Renderer.h"
-#include <iostream>
-#include <sstream>
 
 
 Shader::Shader(const std::string & filepath): m_FilePath(filepath), m_RendererID(0) {
@@ -20,8 +17,20 @@ void Shader::Unbind(){
 	glUseProgram(0);
 }
 
+void Shader::SetUniform1i(const std::string & name, int v0){
+	glUniform1i(GetUniformLocation(name), v0);
+}
+
+void Shader::SetUniform1f(const std::string & name, float v0) {
+	glUniform1f(GetUniformLocation(name), v0);
+}
+
 void Shader::SetUniform4f(const std::string & name, float v0, float v1, float v2, float v3){
 	glUniform4f(GetUniformLocation(name), v0, v1, v2, v3);
+}
+
+void Shader::SetUniformMat4f(const std::string & name, glm::mat4 & v0){
+	glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &v0[0][0]);
 }
 
 int Shader::GetUniformLocation(const std::string & name) {
@@ -30,7 +39,7 @@ int Shader::GetUniformLocation(const std::string & name) {
 	}
 	int location = glGetUniformLocation(m_RendererID, name.c_str());
 	if (location == -1) {
-		std::cout << "uniform: " << name << "does not exist" << std::endl;
+		std::cout << "uniform: " << name << " does not exist" << std::endl;
 	}
 	m_UniformLocationChache[name] = location;
 	return location;
