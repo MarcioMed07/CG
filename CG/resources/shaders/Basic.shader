@@ -26,11 +26,6 @@ uniform float u_Maximum;
 uniform float u_Time;
 
 void main(){
-	int banana = 0;
-	for (int i = 0; i < 25000; i++) {
-		banana += i;
-	}
-
 	vec2 displaceMov = vec2(v_TexC.x + u_Time, v_TexC.y + u_Time);
 	vec4 displaceTex = texture2D(u_DisplaceMap, displaceMov);
 	float displaceConst = displaceTex.b * u_Maximum;
