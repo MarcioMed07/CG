@@ -1239,21 +1239,4 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="resources\textures\water.png">
-      <Filter>Arquivos de Recurso</Filter>
-    </Image>
-    <Image Include="resources\textures\google.png">
-      <Filter>Arquivos de Recurso</Filter>
-    </Image>
-    <Image Include="resources\textures\displacement.jpg">
-      <Filter>Arquivos de Recurso</Filter>
-    </Image>
-    <Image Include="resources\textures\disp.PNG">
-      <Filter>Arquivos de Recurso</Filter>
-    </Image>
-    <Image Include="resources\textures\wat.PNG">
-      <Filter>Arquivos de Recurso</Filter>
-    </Image>
-  </ItemGroup>
 </Project>

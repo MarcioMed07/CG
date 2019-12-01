@@ -431,13 +431,6 @@
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\VertexBufferLayout.h" />
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="resources\textures\disp.PNG" />
-    <Image Include="resources\textures\displacement.jpg" />
-    <Image Include="resources\textures\google.png" />
-    <Image Include="resources\textures\wat.PNG" />
-    <Image Include="resources\textures\water.png" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{C1C4C177-71B1-4404-803B-AFB95E5BE8E0}</ProjectGuid>

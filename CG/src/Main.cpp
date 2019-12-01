@@ -40,17 +40,9 @@ int main()
 		 10.5f, -1.5f, -10.5f,  10.0f, 0.0f,
 		 10.5f,  -1.5f, 10.5f,  10.0f, 10.0f,
 		-10.5f,  -1.5f, 10.5f,  0.0f, 10.0f,
-
-		//-10.5f, -10.5f, -1.5f,  0.0f, 0.0f,
-		// 10.5f, -10.5f, -1.5f,  1.0f, 0.0f,
-		// 10.5f,  10.5f,  1.5f,  1.0f, 1.0f,
-		//-10.5f,  10.5f,  1.5f,  0.0f, 1.0f,
 	};
 
 	unsigned int indices[] = {
-		//4, 5, 6,
-		//6, 7, 4,
-
 		0, 1, 2,
 		2, 3, 0,		
 	};
@@ -80,8 +72,8 @@ int main()
 	shader.SetUniformMat4f("u_ViewM", viewMatrix);
 	shader.SetUniformMat4f("u_ModelM", modelMatrix);
 
-	Texture texture("resources/textures/wat.png");
-	Texture displace("resources/textures/disp.png");
+	Texture texture("resources/textures/cartoonWater2.png");
+	Texture displace("resources/textures/displacement.jpg");
 	shader.SetUniform1i("u_Texture", 0);
 	shader.SetUniform1i("u_DisplaceMap", 1);
 	texture.Bind();
@@ -108,6 +100,8 @@ int main()
 	float max = 0.0f;
 	float alpha = 1.0f;
 	float bgColor[] = {1.0f,1.0f,1.0f};
+	int waterTextureOption = 0;
+	int lastWaterTextureOption = waterTextureOption;
 	
 	//imGui stuff
 	ImGui::CreateContext();
@@ -116,7 +110,6 @@ int main()
 	ImGui::StyleColorsDark();
 
 	while (!glfwWindowShouldClose(window)){
-
 		//TIMING
 			float currentFrame = glfwGetTime();
 			deltaTime = currentFrame - lastFrame;
@@ -136,6 +129,9 @@ int main()
 			shader.SetUniform1f("u_TextureAlpha", alpha);
 
 		//MVP AND CAMERA
+			glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			projectionMatrix = glm::mat4(1.0f);
 			viewMatrix = glm::mat4(1.0f);
@@ -144,40 +140,40 @@ int main()
 			glGetIntegerv(GL_VIEWPORT, viewPort);
 			projectionMatrix = glm::perspective(glm::radians(fov), (float)viewPort[2] / (float)viewPort[3], 0.1f, 100.0f);
 			viewMatrix = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-			
-			
 			shader.SetUniformMat4f("u_ProjectionM", projectionMatrix);
 			shader.SetUniformMat4f("u_ViewM", viewMatrix);
+
 			shader.SetUniformMat4f("u_ModelM", modelMatrix);
-
-		//Render			
-			glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			renderer.Draw(vertexArray, elementBuffer, shader);
-			
 
+			modelMatrix = glm::translate(modelMatrix, glm::vec3(0.00f, 0.1f, 0.0f));
+			shader.SetUniformMat4f("u_ModelM", modelMatrix);
+			shader.SetUniform1f("u_TimeTexture", -1*countTex);
+			renderer.Draw(vertexArray, elementBuffer, shader);
+
+		//Render
 			{
 				ImGui::Text("Camera Options");
 				ImGui::SliderFloat("Mouse Sensitivity", &mouseSensitivity, 0.001f, 1.0f);
 				ImGui::SliderFloat("Move Speed", &cameraSpeed, 0.1f, 10.0f);
 				ImGui::SliderFloat("fov", &fov, 0.1f, 180.0f);
 				ImGui::Text("Water Options");
-				ImGui::SliderFloat("Texture Movement Pace", &paceTex, -0.05f, 0.05f);
-				ImGui::SliderFloat("Displacement Movement Pace", &paceDis, -0.05f, 0.05f);
-				ImGui::SliderFloat("Maximum", &max, -1.0f, 1.0f);
+				ImGui::SliderFloat("Texture Movement Pace", &paceTex, -0.005f, 0.005f,"%.5f");
+				ImGui::SliderFloat("Displacement Movement Pace", &paceDis, -0.005f, 0.005f, "%.5f");
+				ImGui::SliderFloat("Maximum", &max, -0.2f, 0.2f, "%.5f");
 				ImGui::SliderFloat("Texture Alpha", &alpha, 0.0f, 1.0f);
 				ImGui::SliderFloat3("background Color", bgColor, 0.0f, 1.0f);
 				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			}
 			ImGui::Render();
 			ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+
 		//Buffer swapping
-			glfwSwapBuffers(window);		
+			glfwSwapBuffers(window);
+
 		//Poll and process events
 			glfwPollEvents();
 
-			
 	}
 	ImGui_ImplGlfwGL3_Shutdown();
 	ImGui::DestroyContext();
@@ -243,6 +239,7 @@ void processInput(GLFWwindow *window){
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraCurrSpeed;
 	}
+	
 }
 
 
