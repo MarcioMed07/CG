@@ -36,10 +36,10 @@ int main()
 
 	float vertices[] = {
 		//position			  //texCoord	
-		-10.5f, -1.5f, -10.5f,  0.0f, 0.0f,
-		 10.5f, -1.5f, -10.5f,  10.0f, 0.0f,
-		 10.5f,  -1.5f, 10.5f,  10.0f, 10.0f,
-		-10.5f,  -1.5f, 10.5f,  0.0f, 10.0f,
+		-100.5f, -1.5f, -100.5f,  0.0f, 0.0f,
+		 100.5f, -1.5f, -100.5f,  100.0f, 0.0f,
+		 100.5f,  -1.5f, 100.5f,  100.0f, 100.0f,
+		-100.5f,  -1.5f, 100.5f,  0.0f, 100.0f,
 	};
 
 	unsigned int indices[] = {
@@ -100,8 +100,7 @@ int main()
 	float max = 0.06f;
 	float alpha = 0.6f;
 	float bgColor[] = {1.0f,1.0f,1.0f};
-	int waterTextureOption = 0;
-	int lastWaterTextureOption = waterTextureOption;
+	int layerNumber = 5;
 	
 	//imGui stuff
 	ImGui::CreateContext();
@@ -144,12 +143,14 @@ int main()
 			shader.SetUniformMat4f("u_ViewM", viewMatrix);
 
 			shader.SetUniformMat4f("u_ModelM", modelMatrix);
-			renderer.Draw(vertexArray, elementBuffer, shader);
-
-			modelMatrix = glm::translate(modelMatrix, glm::vec3(0.00f, 0.1f, 0.0f));
-			shader.SetUniformMat4f("u_ModelM", modelMatrix);
-			shader.SetUniform1f("u_TimeTexture", -1.0f*countTex);
-			renderer.Draw(vertexArray, elementBuffer, shader);
+			for (float i = (layerNumber-1)/-10.0f; i <= 0.0f; i = i + 0.1f) {
+				modelMatrix = glm::mat4(1.0f);
+				modelMatrix = glm::translate(modelMatrix, glm::vec3(0.00f, i, 0.0f));
+				shader.SetUniformMat4f("u_ModelM", modelMatrix);
+				shader.SetUniform1f("u_TimeTexture", countTex * (((((int)(i*10)) % 2) * 2) +1));
+				renderer.Draw(vertexArray, elementBuffer, shader);
+			}
+			
 
 		//Render
 			{
@@ -162,6 +163,7 @@ int main()
 				ImGui::SliderFloat("Displacement Movement Pace", &paceDis, -0.005f, 0.005f, "%.5f");
 				ImGui::SliderFloat("Maximum", &max, -0.2f, 0.2f, "%.5f");
 				ImGui::SliderFloat("Texture Alpha", &alpha, 0.0f, 1.0f);
+				ImGui::SliderInt("Number of layers", &layerNumber, 1, 200);
 				ImGui::SliderFloat3("background Color", bgColor, 0.0f, 1.0f);
 				ImGui::Text("(%.1f FPS)", ImGui::GetIO().Framerate);
 			}
