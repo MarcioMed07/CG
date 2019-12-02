@@ -1239,4 +1239,24 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\textures\cartoonWater0.png">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
+    <Image Include="resources\textures\cartoonWater1.png">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
+    <Image Include="resources\textures\cartoonWater2.PNG">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
+    <Image Include="resources\textures\disp.PNG">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
+    <Image Include="resources\textures\displacement.jpg">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
+    <Image Include="resources\textures\star.png">
+      <Filter>Arquivos de Recurso</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

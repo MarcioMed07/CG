@@ -13,7 +13,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 GLFWwindow* initWindow();
 
 //Camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraPos = glm::vec3(0.0f, -1.2f, 10.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 bool firstMouse = true;
@@ -93,12 +93,12 @@ int main()
 	
 	Renderer renderer;
 
-	float paceTex = 0.000f;
 	float countTex = 0.0f;
-	float paceDis = 0.000f;
 	float countDis = 0.0f;
-	float max = 0.0f;
-	float alpha = 1.0f;
+	float paceTex = -0.0007f;
+	float paceDis = 0.0007f;
+	float max = 0.06f;
+	float alpha = 0.6f;
 	float bgColor[] = {1.0f,1.0f,1.0f};
 	int waterTextureOption = 0;
 	int lastWaterTextureOption = waterTextureOption;
@@ -148,7 +148,7 @@ int main()
 
 			modelMatrix = glm::translate(modelMatrix, glm::vec3(0.00f, 0.1f, 0.0f));
 			shader.SetUniformMat4f("u_ModelM", modelMatrix);
-			shader.SetUniform1f("u_TimeTexture", -1*countTex);
+			shader.SetUniform1f("u_TimeTexture", -1.0f*countTex);
 			renderer.Draw(vertexArray, elementBuffer, shader);
 
 		//Render
@@ -163,7 +163,7 @@ int main()
 				ImGui::SliderFloat("Maximum", &max, -0.2f, 0.2f, "%.5f");
 				ImGui::SliderFloat("Texture Alpha", &alpha, 0.0f, 1.0f);
 				ImGui::SliderFloat3("background Color", bgColor, 0.0f, 1.0f);
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+				ImGui::Text("(%.1f FPS)", ImGui::GetIO().Framerate);
 			}
 			ImGui::Render();
 			ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
